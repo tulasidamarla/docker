@@ -29,7 +29,8 @@ RUN npm install -g grunt \
 #
 RUN useradd -m couchdb \
         && zypper update -y \
-        && zypper install -y curl which
+        && zypper install -y curl which \
+        && mkdir -p /var/lib/couchdb
 VOLUME /var/lib/couchdb
 RUN zypper install -y couchdb
 RUN sed -i'' 's/bind_address = 127.0.0.1/bind_address = 0.0.0.0/' /etc/couchdb/default.ini
