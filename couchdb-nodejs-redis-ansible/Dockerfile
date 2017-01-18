@@ -42,7 +42,7 @@ EXPOSE 5984
 # Ansible
 #
 
-RUN zypper update -y && zypper install -y ansible
+RUN zypper update -y && zypper install -y libressl-devel ansible
 
 #
 # Install Redis
