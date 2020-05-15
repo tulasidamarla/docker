@@ -34,7 +34,7 @@ Instead of giving root previleges to all users, capabilities allow an user to ha
 
 Docker Images
 -------------
-Images are like templates for a container. An Image containers multiple layers. A running Docker image is a container. 
+Images are like templates for a container. An Image contains multiple layers. A running Docker image is a container. 
 
 For ex to start a container from an image,
 -----------------------------------------
