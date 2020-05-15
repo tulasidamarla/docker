@@ -19,16 +19,16 @@ control groups (cgroups) used to map containers to cgroups. we can set limits to
 
 capabilities give fine grained control of what previliges an user or a process gets. Instead of having root(all) and non root (nothing), it provides lot of things like the following.
 
-CAP_AUDIT_CONTROL<br>
-CAP_CHOWN<br>
-CAP_DAC_OVERRIDE<br>
-CAP_KILL<br>
-CAP_NET_BIND_SERVICE<br>
-CAP_SETUID<br>
-.<br>
-.<br>
-.<br>
-etc..<br>
+    CAP_AUDIT_CONTROL
+    CAP_CHOWN
+    CAP_DAC_OVERRIDE
+    CAP_KILL
+    CAP_NET_BIND_SERVICE
+    CAP_SETUID
+    .
+    .
+    .
+
 
 Instead of giving root previleges to all users, capabilities allow an user to have more fine grained control.
 
@@ -38,117 +38,111 @@ Images are like templates for a container. An Image contains multiple layers. A 
 
 For ex to start a container from an image,
 -----------------------------------------
-docker run -it fedora /bin/bash
+      docker run -it fedora /bin/bash
+      //i --> interactive
+      //t --> sudo tty
 
 The above command runs fedora image(downloaded from docker repository). All the repositories present in the docker registry https://hub.docker.com. Inside a repository there would be different versions of images.
 
-i --> interactive<br>
-t --> sudo tty
 
 /bin/bash --> to open bash terminal inside the fedora image that was run.
 
 To run a container in detached mode 
 -----------------------------------
-docker run -d fedora 
+     docker run -d fedora 
 
-For ex, If you want to run a container, execute a command and then exit, 
------------------------------------------------------------------------
-docker run -d ubuntu /bin/bash -c "echo 'cool content' > /tmp/coolfile"
+Note: To run a container, execute a command and then exit<br>
+
+     docker run -d ubuntu /bin/bash -c "echo 'cool content' > /tmp/coolfile"
+
 
 Note: The above command will pull the docker image fedora from https://hub.docker.com and saves it locally if not already exist.
 
-you can pull images from docker public registry using docker pull command like below.
-------------------------------------------------------------------------------------
-docker pull fedora 
+Pull images from docker public registry 
+---------------------------------------
+     docker pull fedora
+     docker pull -a fedora // pulls all versions
 
-Note:The pull command will always pull latest from repository. 
+Note: The pull command will always pull latest from repository. 
 
-If you want to pull all versions of fedora,
------------------------------------
-docker pull -a fedora
+To fetch all images of fedora
+---------------------------
+    docker images fedora
 
-If you want to see all images of fedora,
-----------------------------------------
-docker images fedora
+To fetch list of docker processes currently running
+---------------------------------------------------
+    docker ps
+    docker ps -a  (shows all container that were run on the host including the currently running ones)
 
-To see list of docker processes currently running,
--------------------------------------------------
-docker ps
-
-docker ps -a  (shows all container that were run on the host including the currently running ones)
+Note: CONTAINER_ID can be fetched from 'docker ps' command.
 
 To attach to a running container,
 --------------------------------
-docker attach CONTAINER_ID
+    docker attach CONTAINER_ID
 
-CONTAINER_ID can be fetched from 'docker ps' command.
+Note: To quit the container shell, without killing it by pressing CTRL+p+q.
 
-quit the container, without killing it by pressing CTRL+p+q.
-
-creating new image from existing.
+creating new image from existing
 --------------------------------
-get the CONTAINER_ID from the command 'docker ps -a'.
+Get CONTAINER_ID 'docker ps' and execute the command "docker commit CONTAINER_ID NEW_IMAGE_NAME".
 
-docker commit CONTAINER_ID NEW_IMAGE_NAME
+To fetch the history of an image
+--------------------------------
+    docker history IMAGE_NAME/IMAGE_ID
 
-To see the history of an image how it was formed
-------------------------------------------------
-docker history IMAGE_NAME/IMAGE_ID
+To save docker image to local file system
+-----------------------------------------
+    docker save -o /path/filename IMAGE_NAME/IMAGE_ID
+    Ex: docker save -o /tmp/fridge.tar fridge
 
-To save docker image 
---------------------
-docker save -o /path/filename IMAGE_NAME/IMAGE_ID
-
-For ex, docker save -o /tmp/fridge.tar fridge
-
-To load the file created in the above step
-------------------------------------------
-docker load -i /tmp/fridge.tar
+To load an image file
+---------------------
+    docker load -i /tmp/fridge.tar
 
 To see the processes running inside a container
 -----------------------------------------------
-docker top CONTAINER_ID
+    docker top CONTAINER_ID
 
-docker run memory=1g (gives container 1GB memory)
+To allocate memory for container
+--------------------------------
+    docker run memory=1g (Allocates 1GB memory)
 
 To get complete information of a container,
 -------------------------------------------
-docker inspect CONTAINER_ID ( we can run this against IMAGE_ID also)
+    docker inspect CONTAINER_ID ( we can run this against IMAGE_ID also)
 
 Starting and stopping containers
 --------------------------------
-For ex, to start an ubuntu container in interactive mode, use the following command<br>
-1)docker run -it ubuntu /bin/bash <br>
-2)To quit the container or to dettach from a container without stopping use CTRL+P+Q<br>
-3)docker stop CONTAINER_ID (to stop the container) or docker kill CONTAINER_ID (brute force)<br>
-we can start the container again using the CONTAINER_ID using<br>
-4)docker start CONTAINER_ID
+a)To start an ubuntu container in interactive mode, `docker run -it ubuntu /bin/bash`<br>
+b)To quit the container or to dettach from a container without stopping use `CTRL+P+Q<br>`<br>
+c)To stop the container `docker stop CONTAINER_ID` or `docker kill CONTAINER_ID` (brute force)<br>
+4)To start the cotainer again `docker start CONTAINER_ID`
 
-"docker info" gives the no of images and containers present in the local system.<br>
-"docker rm CONTAINER_ID" to delete a container. you can't delete a container that is currently running. To remove currently running container use flag '-f'.
+`docker info` gives the no of images and containers present in the local system.<br>
+`docker rm CONTAINER_ID` to delete a container. you can't delete a container that is currently running. To remove currently running container use flag '-f'.
 
 Getting logs
 -------------
-docker logs CONTAINER_ID --> gives list of commands ran inside the container
+    docker logs CONTAINER_ID --> gives list of commands ran inside the container
 
 To remove image
 ---------------
-docker rmi IMAGE_ID --> To remove the image(Container has to be removed first).
+    docker rmi IMAGE_ID --> To remove the image(Container has to be removed first).
 
 Shell Access
 ------------
-All the containers may not provide you a shell access when you run "docker attach". This is because not all containers provide shell. For ex, apache webserver running in a container may not provide shell access. To do this, follow the below steps.
+All containers may not provide you a shell access when you run "docker attach". This is because not all containers provide shell. For ex, apache webserver running in a container may not provide shell access. To do this, follow the below steps.
 
-docker inspect CONTAINER_ID | grep Pid --> This will give Pid say 1923.
+    docker inspect CONTAINER_ID | grep Pid --> This will give Pid say 1923.
 
-nsenter -m -u -n -p -i -t 1923 /bin/bash
+    nsenter -m -u -n -p -i -t 1923 /bin/bash
 
-m --> mount name space
-u --> uts name space
-n --> network name space
-p --> process name space
-i --> ipc name space
-t --> target
+    m --> mount name space
+    u --> uts name space
+    n --> network name space
+    p --> process name space
+    i --> ipc name space
+    t --> target
 
 once you enter the shell , you can use normal shell commands. There is a simple way to enter the shell using " docker exec -it CONTAINER_ID /bin/bash".
 
@@ -156,7 +150,7 @@ Working with Dockerfile
 -----------------------
 Dockerfile contains all the commands a user could call on the command line to assemble an image. Using "docker build" users can create images. For ex,
 
-docker build -t helloworld:0.1 .
+    docker build -t helloworld:0.1 .
 
 t --> target<br>
 helloworld -> is the name of the image with version number followed<br>
