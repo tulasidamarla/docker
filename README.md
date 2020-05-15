@@ -52,6 +52,60 @@ Images
 
 ![Images](images_1.png)
 
+Images in Detail
+-
+- To get image from registry use the command `docker image pull` or `docker pull`. For ex: `docker pull redis`.
+
+- An image is a bunch of independent layers that are loosely coupled by a manifest file. So, an image is not a single blob file.
+- A manifest file describes the image like id, creation time and most importantly the list of layers that it stacks.
+- The layers are unaware of the bigger image. So, one layer of an image has no reference to the other.
+- To support multi architecture support and content addressable storage, Pulling a docker image consists of two parts.
+  - Get manifest: Fat manifest and image manifest
+  - Pull layers
+
+![Docker  info](docker_info.png)
+
+Manifest
+-
+- There are two types of manifest
+  - Fat manifest
+    - Contains details about the list of architectures supported and a manifest for each of those.
+	- `docker pull` gets the fat manifest and verifies if the fat manifest contains the host system architecture in the list of supported architectures.
+  - Image manifest
+    - If fat manifest supports the host system architecture, then image manifest is pulled.
+    - Each of the layers present in the image manifest is pulled from docker registry's blob store as shown in the image below.
+	- To look at content of manifest `docker inspect imageName/imageId`
+
+![Pull image](images_2.png)
+
+Content addressable storage
+-
+- Earlier docker did not hash it's images and there was no easy way to know if the image that is pulled from registry is right.
+- Docker 1.10 introducted CAS(content addressable storage)
+- CAS hashes all of the content in the image and use that as image id, so when we pull image from registry, we run the hash of it and verify if it matches the image id.
+- The image manifest shows path locations where the image data is stored.
+
+Layers
+-
+- Base Layer
+  - This is the OS layer which contains the files and os objects used to build the basic OS like ubuntu etc. If the docker container uses ubuntu, it will have common ubuntu tools and file system utilities etc. So, it is totally possible to run a centos docker host with ubuntu based containers on it. 
+  - It is going to be Linux containers on Linux host and Windows containers on Windows host on Kernal(This is not applicable for Hyper-V containers).
+- App Layer
+  - On top of Base Layer, there will be bunch of other layers which are required to run the application like program runtimes(jvm), build tools(maven), servers(tomcat), updates etc.
+- Each of the layers are present in the directory /var/lib/docker/aufs/diff for linux, for windows C:\programData\docker\overlay2\diff.
+- When building images some of the commands build new layers and some of them add content to the image config file. 
+- The command `ls -l /var/lib/docker/aufs/diff` all layers as shown below.
+
+![Layers](layers.png)  
+
+- The command `docker history imageName/imageId` shows the commands that formed the image.
+
+![Docker history](docker_history.png)  
+
+- To remove the docker image `docker rm imageName`
+
+
+
 In the initial days every application needs an infracture.
 To run an application it needs hardware, os and installing lots of software, licenses etc. Each of the applications we run on the hardware is very less utilized. Average utilization for many of those is under 10%. It led to virtualization.
 
