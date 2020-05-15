@@ -11,11 +11,11 @@ All applications running inside a VM needs a OS. The OS's only purpose is to run
 
 Containers are more light weight than VM's. Unlike hyperviser virtualization , containers use os virtualization. Say an Unix os is running on a physical machine. Unix kernal manages the underlying hardware. Containers hold apps using a construct called user space. Containers create multiple isolated areas of disk user spaces. This is called container virtualization or os level virtualization. Every container shares the underlying OS. so containers consume less CPU and RAM.
 
-Containers provide isolated instances of things like root file system, process tree, networking etc. It menas if there are 10 instances each will have its own view of the root file system. same goes with the processes. A process inside one container cannot send signal to another process in another container. But, how does this work? There are various kernal features like name spaces, cgroups and capabilities to do this. 
+Containers provide isolated instances of things like root file system, process tree, networking etc. If there are 10 containers each will have its own view of the root file system. same goes with the processes. A process inside one container cannot send signal to another process in another container. But, how does this work? There are various kernal features like name spaces, cgroups and capabilities to do this. 
 
 Linux kernal uses various name spaces like pid (for processes), net (for networking), mnt (for mount and storage) and user (for users to have root previliges inside the container but not outside containers).
 
-control groups (cgroups) used to map containers to cgroups. we set limits to howmuch memeory , cpu etc can be used by a container using cgroups. If we run multiple containers on a machine these are very useful.
+control groups (cgroups) used to map containers to cgroups. we can set limits to memory, cpu etc that can be used by a container with cgroups. If we run multiple containers on a machine these are very useful.
 
 capabilities give fine grained control of what previliges an user or a process gets. Instead of having root(all) and non root (nothing), it provides lot of things like the following.
 
