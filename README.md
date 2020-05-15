@@ -19,23 +19,22 @@ control groups (cgroups) used to map containers to cgroups. we set limits to how
 
 capabilities give fine grained control of what previliges an user or a process gets. Instead of having root(all) and non root (nothing), it provides lot of things like the following.
 
-CAP_AUDIT_CONTROL
-CAP_CHOWN
-CAP_DAC_OVERRIDE
-CAP_KILL
-CAP_NET_BIND_SERVICE
-CAP_SETUID
-.
-.
-.
-etc..
+CAP_AUDIT_CONTROL<br>
+CAP_CHOWN<br>
+CAP_DAC_OVERRIDE<br>
+CAP_KILL<br>
+CAP_NET_BIND_SERVICE<br>
+CAP_SETUID<br>
+.<br>
+.<br>
+.<br>
+etc..<br>
 
 Instead of giving root previleges to all users, capabilities allow an user to have more fine grained control.
 
 Docker Images
 -------------
-Images are like templates for a container. An Image containers multiple layers.
-A running Docker image is a container. 
+Images are like templates for a container. An Image containers multiple layers. A running Docker image is a container. 
 
 For ex to start a container from an image,
 -----------------------------------------
@@ -43,7 +42,7 @@ docker run -it fedora /bin/bash
 
 The above command runs fedora image(downloaded from docker repository). All the repositories present in the docker registry https://hub.docker.com. Inside a repository there would be different versions of images.
 
-i --> interactive
+i --> interactive<br>
 t --> sudo tty
 
 /bin/bash --> to open bash terminal inside the fedora image that was run.
@@ -62,7 +61,8 @@ you can pull images from docker public registry using docker pull command like b
 ------------------------------------------------------------------------------------
 docker pull fedora 
 
-The above command will pull latest from repository. 
+Note:The pull command will always pull latest from repository. 
+
 If you want to pull all versions of fedora,
 -----------------------------------
 docker pull -a fedora
@@ -117,23 +117,26 @@ docker inspect CONTAINER_ID ( we can run this against IMAGE_ID also)
 
 Starting and stopping containers
 --------------------------------
-For ex, to start an ubuntu container in interactive mode, use the following command
-1)docker run -it ubuntu /bin/bash 
-2)To quit the container or to dettach from a container` without stopping use CTRL+P+Q
-3)docker stop CONTAINER_ID (to stop the container) or docker kill CONTAINER_ID (brute force)
-we can start the container again using the CONTAINER_ID using
+For ex, to start an ubuntu container in interactive mode, use the following command<br>
+1)docker run -it ubuntu /bin/bash <br>
+2)To quit the container or to dettach from a container without stopping use CTRL+P+Q<br>
+3)docker stop CONTAINER_ID (to stop the container) or docker kill CONTAINER_ID (brute force)<br>
+we can start the container again using the CONTAINER_ID using<br>
 4)docker start CONTAINER_ID
 
-Note:
------
-"docker info" gives the no of images and containers present in the local system.
+"docker info" gives the no of images and containers present in the local system.<br>
 "docker rm CONTAINER_ID" to delete a container. you can't delete a container that is currently running. To remove currently running container use flag '-f'.
 
+Getting logs
+-------------
 docker logs CONTAINER_ID --> gives list of commands ran inside the container
 
+To remove image
+---------------
 docker rmi IMAGE_ID --> To remove the image(Container has to be removed first).
-Note
-----
+
+Shell Access
+------------
 All the containers may not provide you a shell access when you run "docker attach". This is because not all containers provide shell. For ex, apache webserver running in a container may not provide shell access. To do this, follow the below steps.
 
 docker inspect CONTAINER_ID | grep Pid --> This will give Pid say 1923.
@@ -155,13 +158,13 @@ Dockerfile contains all the commands a user could call on the command line to as
 
 docker build -t helloworld:0.1 .
 
-t --> target
-helloworld -> is the name of the image with version number followed
+t --> target<br>
+helloworld -> is the name of the image with version number followed<br>
 . --> to consider all the files from current directory for the build
 
 working with repositories
 -------------------------
-we know already to pull image , we use docker pull command. To push an image to a repository first you need to create an account and then create a repository at hub.docker.com
+To pull image , we use docker pull command. To push an image to a repository create an account followedby create a repository at hub.docker.com
 
 After creating the repository, you need to tag your image to the repository like this.
 
@@ -177,23 +180,23 @@ docker push tulasiramdamarla/helloworld:1.0
 
 Dockerfile contains the following important commands
 ----------------------------------------------------
-FROM --> used to pull the base image from repository
-MAINTAINER --> Info of the user who maintains the Dockerfile
-RUN --> It is a build time construct. Add layers to images. Generally used to install applications.
+FROM --> used to pull the base image from repository<br>
+MAINTAINER --> Info of the user who maintains the Dockerfile<br>
+RUN --> It is a build time construct. Add layers to images. Generally used to install applications.<br>
 CMD --> It is a run time construct. used to run commands in containers at launch time. This is equivalent of "docker run <args> <command>" . We have used /bin/bash before. This is nothing but a command given to the container to execute after it is launched.
 
-Note: If we pass any command with "docker run", that will override any CMD instruction inside Dockerfile. Also, there can be only one CMD instruction per Dockerfile. If there are more CMD instructions, only the last one is considered.
+Note: Any command line argument with "docker run", will override CMD instruction of Dockerfile. Also, there can be only one CMD instruction per Dockerfile. If there are more CMD instructions, the last one is considered.
 
 There are two ways we can work with CMD instructions. Shell form and Exec form.
 
-Shell form --> CMD echo "Hello World " (These commands are prepended by "/bin/sh -c"
+Shell form --> CMD echo "Hello World " (These commands are prepended by "/bin/sh -c"<br>
 Exec form --> CMD ["command","args"]
 
 ENTRYPOINT --> unlike CMD, any argumnets passed with docker run command, goes to ENTRYPOINT command as an argument. For ex, dockerfile image name is test and the following command is present in Dockerfile.
 
 ENTRYPOINT ["echo"]
 
-Now run the image using the following command prints "Hello World" on the screen.
+Run the image using the following command prints "Hello World" on the screen.
 
 docker run -d test Hello World
 
@@ -201,8 +204,8 @@ Note: Unlike CMD, you cannot override ENTRYPOINT command. you can pass argument 
 
 ENV --> used to enter environment variables in name=value format.
 
-
-volumes
+Volumes
+-------
  
 
 
