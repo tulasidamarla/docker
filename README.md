@@ -1,6 +1,56 @@
 # Docker
 
-Containers are all about applications. 
+Containers
+-
+- Containers are all about applications. 
+- A container is an isolated area with resource usage limits applied. 
+- A container maintains this isolation using kernal's name spaces and control groups.
+- Name spaces and control groups are present since the evolution of unix/linux OS, but they remained obscure because of the complexity. Docker Engine makes this very easy.
+ 
+![containers](containers.png)
+
+Docker Engine
+-
+- Docker Engine is modular.
+- We interact with Docker engine either through CLI or api. Under the hood Docker engine consists of various parts like docker daemon, containerd, OCI etc.
+- The command `docker container run...` to start the container, it makes a call to the api `/containers/create` in the docker engine.
+- Docker engine gets all the kernal stuff like control groups and name spaces and start the container.
+
+![docker engine](dockerengine.png)
+
+Namespaces and Control Groups
+-
+- Linux containers are around even before docker. To make them working one must be an expert on the kernal.
+- Name spaces and Control groups are two major building blocks for building containers.
+- These two are linux kernal primitives, and now they are available on windows aswell.
+  - Namespaces
+	- Name spaces are about isolation and Control groups are about grouping objects and setting limits.
+	- Name spaces split the Host OS into multiple isolated virtual OS's like hypervisors.
+	- With hypdervisor a single physical machine resources like CPU, RAM, disk storage, networking are split into multiple VM's, such that each VM has its own Virtual CPU, Virtual RAM, Virtual disk storage, Virtual networking etc.
+	- In container world, name spaces use HOST OS resources which are high level constructs like file system, process trees and users and turn them into multiple OS's called containers.
+	- Each container gets it's own file system, process tree, root user etc, but share the same OS.
+	- In Linux world namespaces are collection of 
+	  - Process ID(pid): Each container has it's own process tree with its own pid 1. 
+	  - Network(net): Each container has it's own ipaddresses, route tables etc.
+	  - File system/mount(mnt): Each container has it's own root file system `/` or `C:\` 
+	  - Inter-proc comms(ipc): Each container gets it's own shared memory isolated from other containers.
+      - UTS(uts): Every container get's its own hostname.
+	  - User(user): Specific to docker, to provide different privileges to different users with in the container.
+  - Control Groups(In windows Job objects)
+	- Control groups are used for grouping process and imposing resource limits like amount of CPU, RAM , disk storage.
+
+![Control Groups](control_groups.png)
+
+Images
+-
+- Image is a read only template for creating application containers. 
+- Typical Image consists of OS files/objects, app files, manifests etc.
+- Images are build-time construct, whereas containers are run-time siblings.
+- An image is a bunch of layers stacked up on one another.
+- An image can be used to run multiple containers from it.
+- Images are stored in a registry(on-premise or cloud) and later can be pulled on to the hosts(`docker pull image-name`) in which container needs to be run.
+
+![Images](images_1.png)
 
 In the initial days every application needs an infracture.
 To run an application it needs hardware, os and installing lots of software, licenses etc. Each of the applications we run on the hardware is very less utilized. Average utilization for many of those is under 10%. It led to virtualization.
