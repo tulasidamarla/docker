@@ -3,7 +3,7 @@
 Containers are all about applications. 
 
 In the initial days every application needs an infracture.
-To run an application it needs hardware, os and installting lots of software, licenses etc. Each of the applications we run on the hardware is very less utilized. Average utilization for many of those is under 10%. It led to virtualization.
+To run an application it needs hardware, os and installing lots of software, licenses etc. Each of the applications we run on the hardware is very less utilized. Average utilization for many of those is under 10%. It led to virtualization.
 
 we can run multiple apps on a single physical machine using hyperviser virtualization. It improved utilization to more than 50%. Even though it is far better than previous models, it is not perfect.
 
