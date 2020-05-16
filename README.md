@@ -197,7 +197,7 @@ Multistage build Demo
 
 Working with containers
 -
-- Containers are the atomic(smallest) units of scheduling. In Virtualization world it is `VM`, in Kuberneters world it is `Pod`, in docker world it is `Container`.
+- Containers are the atomic(smallest) units of scheduling. In Virtualization world it is `VM`, in Kubernetes world it is `Pod`, in docker world it is `Container`.
 - If we want to run an app, we run it as one or more containers. So, containers are running instances of images.
 - Images are a combination of one or more read-only layers. Containers have a thin writable layers lashed on top during run-time along with the read-only layers of the build-time. Any changes made while containers running are written to the write layer. Each container maintains a read-only copy of image and any changes required to it will be written on the write layer. 
 - Writing to containers happens with the help union file systems(ufs) and union mounts. 
@@ -237,6 +237,83 @@ Logging
 	  - If we want to override the default driver options for each container, the command line arguments `--log-driver` and `--log-opts`.
   - To view logs `docker inspect containerId`.
   
+Swarm
+-
+- Despite the raise of `Kubernetes`, swarm is at the heart of everything that docker is doing. Swarm has two parts namely `Secure cluster` and `orchestration`.
+- `Secure cluster` part is at the central to the future of docker.
+- Swarm is also central to the native support of `docker` to `kubernetes`.
+- Secure Swarm Cluster
+  - `Swarm cluster` contains group of docker nodes(or hosts), which are all secure.
+  - In swarm, a docker node can either be a manager or a worker.
+  - Swarm get mutual TLS, where workers and managers mutually authenticate with one another and all of the network chat is encrypted.
+  - Swarm has a cluster store which is encrypted and is distributed to all managers.
+  - Once `Swarm cluster` is formed, then we can schedule to start running containers in it. So, instead of running individual `docker run` commands to run containers, we can give commands to the cluster. Swarm will decide where to run the containers and does the work load balancing. 
+  - Two types of work that can be done on `Swarm cluster`, namely `Native swarm work` and `Kubernetes work`. 
+
+<img src="swarm_cluster.png" alt="Swarm Cluster" align="middle" width="70%">
+
+Swarm In Detail
+-
+- Docker installation comes with lot of tools like containerd, Swarmkit etc, bundled together. Docker bundles all of these different tools and gives an integrated slick api. The source code for swarmkit can be seen at https://github.com/docker/swarmkit
+- Before docker 1.12, swarmkit was a seperate project. Since docker 1.12 it is integrated into docker.
+- From docker 1.12 onwards, we can run docker in `single-engine` mode ro `swarm mode`.
+  - In single-engine mode, we need to work with each docker node seperately.
+  - In `swarm mode`, we don't need to login to each node to run and manage containers.
+    - Any node running as part of `swarm cluster` is in `swarm mode`.
+	- To verify if a node is present in `swarm mode` use the command `docker info`.
+- To initiate a `swarm cluster` or to join an existing `swarm cluster`, use the command `docker swarm init`. This command will flips a docker node into `swarm mode`.
+  - If a docker node initiates a `swarm cluster`, it automatically becomes the first manager of the cluster and also becomes the `leader`.
+  - This leader manager node also becomes the Root certifcate authority(CA) of the `swarm cluster`. This also issues a client certificate and builds a secure cluster store(etcd) and automatically distributed to every other manager in the node and it is encrypted.
+  - We can configure external CA with the command `docker swarm init --external-ca ${external-ca}`.
+  - The `swarm cluster` creates a default certificate rotation policy of 90 days.
+  - The `swarm cluster` also creates set of cryptographic join-tokens, one for joining new managers and other for joining new workers as shown below when running `docker swarm init`.
+
+		PS C:\ProgramData\Docker> docker swarm init
+		Swarm initialized: current node (6vns2mfg2do7ia00bhpos7i55) is now a manager.
+
+		To add a worker to this swarm, run the following command:
+
+		docker swarm join --token SWMTKN-1-00ab7xrtthkmibfk4e81n3xgjrwu7veq5yua6nr2563jraa9ud-63q4ih87jwx6ph4usb94m2dl8 192.168.65.3:2377
+
+		To add a manager to this swarm, run 'docker swarm join-token manager' and follow the instructions.
+
+  - To join a new manager to an existing `swarm cluster`, start docker in single-engine mode and execute the command `docker swarm join` as shown above.
+  - Swarm Cluster Managerment
+    - Swarm managers are configured for high availability. It is handled by RAFT.
+	- Best practices for HA is to go with odd numbers like 3,5,7 and also to keep the number mininum. So, anything beyond 7, it may end in consuming lot of timing in making decisons. 
+	- Best practices for HA also is to have fast and reliable networks. For ex, if we use aws, don't keep these managers across regions, as interactions among managers may not reliable. But, it is ok to keep them in different availability zones in a region.
+	- Every `swarm cluster` has one `leader manager` and `follower managers`. 
+	- Commands can be issued to any manager.
+	- If a leader fails, other leader manager is elected from followers.
+    - `Swarm cluster` can have mix of linux and windows worker nodes.
+	- Worker nodes will not have access to cluster store, but they will have the information about all the manager ips. 
+	- Each worker node gets a certificate from leader manager.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
