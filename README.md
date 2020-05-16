@@ -134,15 +134,16 @@ Registries
 
 Dockerfile
 -
-- Dockerfile is a list of instructions to build an image with the runtime required along with application inside.
+- `Dockerfile` is a list of instructions to build an image with the runtime required along with application inside.
 - It is a convention to write all docker instructions in capital.
 - An instruction if of the format `<Instruction> <value>`.
-- Dockerfile always start with the FROM instruction which defines the base image.
+- Dockerfile always start with the `FROM` instruction which defines the base image.
 - It is a good practice to list maintainer.
-- Use RUN command to execute a command and build a layer.
-- Use COPY command to copy code into image as a new layer.
-- Some instructions like WORKDIR can add metadata to image configuration instead of creating layers.
-- Use ENTRYPOINT to start the application inside the image.
+- Use `RUN` command to execute a command and build a layer.
+- Use `COPY` command to copy code into image as a new layer.
+- Some instructions like `WORKDIR` can add metadata to image configuration instead of creating layers.
+- Use `EXPOSE` command to expose the port out of docker container.
+- Use `ENTRYPOINT` to start the application inside the image. `ENTRYPOINT` executes the command(first argument) with options(second argument). `ENTRYPOINT` command options are relative to the `WORKDIR`.
 - Let's see an example on how to write a Dockerfile for a node application.
 
 		# Test web-app to use with Pluralsight courses and Docker Deep Dive book
@@ -166,20 +167,76 @@ Dockerfile
 
 		ENTRYPOINT ["node", "./app.js"]  
   
+Build Image and Run the container
+-
+- To build the image with `Dockerfile` use the command `docker build -t imageName /path/to/appcode`. Ex: `docker build -t myImage .`. `-t` represnt tag.
+- To build the image using the build context from a remote location like git, Use command `docker build -t imageName gitURL`. Ex:`docker build -t psweb https://github.com/tulasidamarla/psweb.git`. 
+- To run the container use the command `docker run -d --name containerName -p HOST_PORT:CONTAINER_PORT imageName`. Ex: `docker run -d --name testApp -p 8080:8080 myImage`
+  - `-d` to run the container in detached mode. `-it` for interactive mode.
+- To remove an image `docker rmi imageId`.  
   
+Multi-stage builds
+-
+- Smaller images are better because it results in faster builds and deployments. So, minimal OS and package sizes are better.
+- Multi-stage builds are helpful to seperate the build contstructs so that our development environment build images are different from production interms of image layers and size.
+- Multistage Dockerfile can be seen in the image below.
+- Each stage can be give a name using `AS` command as shown above.
+- The base image used for stage storefront(node:latest) is big in size. This is used for building the application. The resulting image has all layers of the stage.
+- The base image used for stage appserver(maven:latest) is also big, which contains image along with the build tool maven. This image is used to build the java application code and the resulting image has all layers including java runtime, maven build tool etc.
+- The base image for stage production is small in size. The subsequent layers have added some configuration to the base image. `COPY` command at line:17 copies the static build code from the `storefront` stage and adds an additional layer. `COPY` command at line:19 copies the java jar from the stage `appserver` and adds an additional layer.
 
+![Multi-stage Build](multi_stage_builds.png)
+
+Multistage build Demo
+- 
+- Multi-stage Dockerfile demo code can be found at https://github.com/tulasidamarla/atsea-sample-shop-app.
+- change directory to app and execute the build command `docker build -t multistage .`
+- In the below image, we can clearly see multi-stage image size is lessthan the following two images.
+
+![Multi-stage Build Demo](multi_stage_builds_demo.png)
+
+Working with containers
+-
+- Containers are the atomic(smallest) units of scheduling. In Virtualization world it is `VM`, in Kuberneters world it is `Pod`, in docker world it is `Container`.
+- If we want to run an app, we run it as one or more containers. So, containers are running instances of images.
+- Images are a combination of one or more read-only layers. Containers have a thin writable layers lashed on top during run-time along with the read-only layers of the build-time. Any changes made while containers running are written to the write layer. Each container maintains a read-only copy of image and any changes required to it will be written on the write layer. 
+- Writing to containers happens with the help union file systems(ufs) and union mounts. 
+- Stopping a container is similar to stopping a VM. All of its content is persisted.
+- Containers have a life cycle. We can start, stop and delete a container.
+- When a Container is stopped, its current state is saved. It means, any changes happen to container while it is running are preserved. 
+- Working with commands
+  - To list running containers `docker container ls`.
+  - To list all the containers including the stopped ones, `docker container ls -a`.
+  - To run container in interactive mode `docker container run -it imageName CMD`. For ex: `docker container run -it alphine sh`.
+  - To quit the container without terminating it, CTRL+p+q
+  - To stop a running container `docker container stop continerId`.
+  - To restart a stopped container `docker container start containerId`.
+  - To login into an existing container `docker container exec -it containerId CMD`. For ex: `docker container exec -it 800b57c27c5c sh`.
+    - If we don't mention the CMD, container will run and logs into the default process as mentioned in the image manifest's CMD. To know about this default process of an image use `docker inspect` command.
+	- Any run-time arguments provided as part of `docker container` command, will override the `CMD` instructions present in the image whereas Any run-time arguments provided for `ENTRYPOINT` are appended.
+  - To execute commands on a running container without logging in `docker container exec containerId CMD`. For ex: `docker container exec 800b57c27c5c ls -l`.
+  - To delete a container `docker rm containerID`, use `-f` for force remove.
+  - To remove all the containers `docker container rm $(docker container ls -aq) -f`.
+  - To view all the ports of a running container `docker port containerId`.
   
-
-
-
-
-
-
-
-
-
-
-
+Logging
+-
+- There are two types of logs.
+  - Daemon logs
+    - Most linux systems use `systemd`, so we can read these logs using `journalctl` command. For ex: `journalctl` -u docker.service`
+	- For non systemd linux systems, check them at `/var/log/messages`.
+	- For Windows, `~/AppData/Local/Docker` or can verify them at windows event viewer.
+  - Container logs
+    - Container logs are the application logs. Docker expects application logs to be `STDOUT` and `STDERR`. Docker captures pid1 of every container is captured and forwarded. So, design the containers in a way that applications run as pid1.
+	- If application logs are written to a file, symlinks can be written for those files, so that logs can be written to STDOUT and STDERR`.
+	- Mount the location of log files, so that logs can be preserved even if the container is stopped or deleted.
+	- Logging drivers
+	  - Since Docker 17.x, docker enterprise edition(EE) has provisioned logging drivers.
+	  - Logging drivers are plugins, which are useful for integrating container logs to the existing logging solutions like Syslog, Splunk, Gelf, Fluentd etc.
+      - we can configure the default logging driver using `daemon.json` file, so any containers started will use that driver.
+	  - If we want to override the default driver options for each container, the command line arguments `--log-driver` and `--log-opts`.
+  - To view logs `docker inspect containerId`.
+  
 
 
 
