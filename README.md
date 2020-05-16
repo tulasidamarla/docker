@@ -104,6 +104,99 @@ Layers
 
 - To remove the docker image `docker rm imageName`
 
+Registries
+-
+- Images are pulled from registry to docker host.
+- The default registry for docker is dockerhub. Other registries are available from google, amazon also.
+- Docker provides an on-premise registry called Docker trusted registry(DTR) with it's enterprise edition.
+- Docker maintains a local registry on each docker host. The path of local registry for linux is /var/lib/docker/storage-drive and for windows C:\programData\docker\windowsfilter.
+- Docker registry maintains two levels of images.
+  - Official images
+    - These images reside at the top level of hub namespace(docker.io)
+	- We name these images redis, nginx etc, but they are actually not the images.
+	- The actual image name can be identified with REGISTRY/REPO/TAG
+	  - Registry can be docker hub, google, amazon etc.
+	  - Repo's can be redis, nginx , fedora, ubuntu etc.
+	  - Tag's are the original images. In the redis ex, tag name is `latest`.
+	  - Registry defaults to docker hub, tag defaults to latest if we don't mention explicitly.
+	  - Full command to pull image is `docker pull REGISTRY/REPO:TAG`. For ex, `docker pull docker.io/redis:4.0.1`
+	  - An image can have different tag ids. For ex, if latest version of redis is 4.0.1, then both will refer to the same image id.
+  - Unofficial images
+	- These images reside inside an organization name or an user name.
+	- The unofficial images reside at /REGISTRY/(ORG_NAME/USER_NAME)/REPO/TAG
+	- The command used to pull these images `docker pull (ORG_NAME/USER_NAME)/REPO:TAG`. For ex, `docker pull tulasiramdamarla/helloworld:1.0`.
+- Pushing images to the registry
+  - Each of the layers in an image contains data. For each layer a hash is computed using its content, which is nothing but the layer id. This is called as content hash.
+  - When pushing images, we define a manifest that defines the layers in it and push the manifest and layers independently.
+  - Distributed Hash
+    - When pushing the layers over internet, they are compressed. As we know, layer id's are content hashes, when the data is compressed it's content will be changed. So, when these arrive at registry, verification fails.
+    - To get around the problem of hashes, when maifest is created layers are compressed and new hash is created. This hash is called distributed hash.
+
+Dockerfile
+-
+- Dockerfile is a list of instructions to build an image with the runtime required along with application inside.
+- It is a convention to write all docker instructions in capital.
+- An instruction if of the format `<Instruction> <value>`.
+- Dockerfile always start with the FROM instruction which defines the base image.
+- It is a good practice to list maintainer.
+- Use RUN command to execute a command and build a layer.
+- Use COPY command to copy code into image as a new layer.
+- Some instructions like WORKDIR can add metadata to image configuration instead of creating layers.
+- Use ENTRYPOINT to start the application inside the image.
+- Let's see an example on how to write a Dockerfile for a node application.
+
+		# Test web-app to use with Pluralsight courses and Docker Deep Dive book
+		# Linux x64
+		FROM alpine
+
+		LABEL maintainer="tulasiram.damarla@gmail.com"
+
+		# Install Node and NPM
+		RUN apk add --update nodejs nodejs-npm
+
+		# Copy app to /src
+		COPY . /src
+
+		WORKDIR /src
+
+		# Install dependencies
+		RUN  npm install
+
+		EXPOSE 8080
+
+		ENTRYPOINT ["node", "./app.js"]  
+  
+  
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 In the initial days every application needs an infracture.
