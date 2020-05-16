@@ -301,9 +301,11 @@ Swarm Demo
 - `docker swarm join-token manager` on the leader node, gives information to join `swarm cluster`. Switch to the other node and execute the highlighted command shown in the below image.
 
 <img src="swarm_join_manager.png" alt="swarm_join_manager" align="middle" width="70%">
+
 - `docker swarm join-token worker` on any leader node, gives information for a worker node to join `swarm custer`. Switch to worker node and start docker in single-engine mode and execute the command to join `swarm cluster`. Worker node can be anything. It means, a linux `swarm cluster` can have a windows worker node. So, swarm can have hybrid cluster.
 - `docker node ls` command from any of manager nodes gives the information of all the nodes in the `swarm cluster`. The manager leader has the manager status `Leader`, follower have manager status `Reachable` and worker nodes status would be left blank as shown in the below image.
 - `docker node ls` command will not work from worker nodes.
+
 <img src="list_swarm_cluster_status.png" alt="list_swarm_cluster_status" align="middle" width="70%">
 
 - Tokens for all workers can be rotated with the command `docker swarm join-token rotate worker`. This gives new worker token without affecting the existing worker nodes. But, any new worker should use this new token to join the `swarm cluster`. 
@@ -338,39 +340,4 @@ Autolock
 <img src="swarm_unlock.png" alt="swarm_unlock" align="middle" width="70%">  
 
 - To update the certificate expiry for say 2 days, use the command `docker swarm update --cert-expiry 48h`.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
-
-
-
 
